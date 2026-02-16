@@ -1,5 +1,6 @@
 const Polls = require("../models/polls.model");
 const Poll = require("../models/polls.model");
+const {nanoid} = require('nanoid');
 
 //create a poll
 const createPoll = async(req,res)=>{
@@ -7,15 +8,24 @@ const createPoll = async(req,res)=>{
         const {question,options}=req.body;
         const userId = req.userId;
 
+        const shareId = nanoid(8);
+
+        const formattedOptions = options.map(opt => ({
+            text: opt,
+            votes: 0
+        }));
+        
         const poll = await Poll.create({
             question:question,
-            options:options,
+            options:formattedOptions,
+            shareId,
             createdBy:userId,
         });
 
         return res.status(201).json({
             message:"Poll created successfully",
-            poll
+            poll,
+            shareId,
         });
         
     }catch(err){

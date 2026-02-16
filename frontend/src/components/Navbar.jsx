@@ -1,9 +1,12 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { LogOut, PlusCircle, Home, Users } from "lucide-react";
+import { logoutUser } from "../lib/auth.api";
 
 export default function Navbar() {
   const nav = useNavigate();
   const location = useLocation();
+
+  const token = localStorage.getItem("token"); // 👈 check login
 
   const linkStyle = (path) =>
     `flex items-center gap-1 px-3 py-2 rounded-lg transition ${
@@ -40,17 +43,25 @@ export default function Navbar() {
             Join
           </Link>
 
-          <div className="w-9 h-9 rounded-full bg-gradient-to-r from-teal-400 to-cyan-500 text-white flex items-center justify-center font-bold ml-2">
-            U
-          </div>
+          {token && (
+            <>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-r from-teal-400 to-cyan-500 text-white flex items-center justify-center font-bold ml-2">
+                U
+              </div>
 
-          <button
-            onClick={() => nav("/")}
-            className="ml-2 flex items-center gap-2 bg-gradient-to-r from-teal-400 to-cyan-500 text-white px-4 py-2 rounded-xl shadow hover:scale-[1.03] transition"
-          >
-            <LogOut size={16} />
-            Logout
-          </button>
+              <button
+                onClick={() => {
+                  logoutUser();
+                  nav("/");
+                }}
+                className="ml-2 flex items-center gap-2 bg-gradient-to-r from-teal-400 to-cyan-500 text-white px-4 py-2 rounded-xl shadow hover:scale-[1.03] transition"
+              >
+                <LogOut size={16} />
+                Logout
+              </button>
+            </>
+          )}
+
         </div>
       </div>
     </nav>

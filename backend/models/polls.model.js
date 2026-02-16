@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const {nanoid} = require('nanoid');
 const {Schema} = mongoose;
 
 const pollsSchema = new Schema({
@@ -27,7 +26,7 @@ const pollsSchema = new Schema({
     shareId:{
         type:String,
         unique:true,
-        default: ()=> nanoid(8),
+        required:true,
     }
 },{timestamps:true});
 

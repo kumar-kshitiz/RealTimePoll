@@ -35,7 +35,10 @@ const vote = async(req,res)=>{
         
         const updatedPoll = await Polls.findById(poll_id);
         const io = req.app.get("io");
-        io.to(updatedPoll.shareId).emit("pollUpdated",updatedPoll);
+        // io.to(updatedPoll.shareId).emit("pollUpdated",updatedPoll);
+        io.to(updatedPoll.shareId).emit("voteUpdated", {
+            options: updatedPoll.options
+        });
 
         return res.status(200).json({
             message:"User voted successfully",

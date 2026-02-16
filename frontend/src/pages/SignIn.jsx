@@ -1,9 +1,25 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
 import Navbar from "../components/Navbar";
+import { useState } from "react";
+import { loginUser } from "../lib/auth.api";
 
 export default function SignIn() {
   const nav = useNavigate();
+  const [form, setForm] = useState({
+    email:"",
+    password:""
+  });
+
+  const handleSubmit = async()=>{
+    try{
+      await loginUser(form);
+      nav('/home');
+    }catch(err){
+      // alert(err);
+      console.log("Login Failed",err);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-500">
@@ -26,6 +42,7 @@ export default function SignIn() {
               type="email"
               placeholder="Email"
               className="w-full border border-gray-300 pl-10 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-teal-400 focus:outline-none"
+              onChange={(e)=> setForm({...form,email:e.target.value})}
             />
           </div>
 
@@ -35,12 +52,13 @@ export default function SignIn() {
               type="password"
               placeholder="Password"
               className="w-full border border-gray-300 pl-10 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-teal-400 focus:outline-none"
+              onChange={(e)=> setForm({...form,password:e.target.value})}
             />
           </div>
 
           <button
-            onClick={() => nav("/home")}
             className="w-full bg-gradient-to-r from-teal-400 to-cyan-500 text-white py-3 rounded-xl font-semibold shadow-md hover:scale-[1.02] transition"
+            onClick={handleSubmit}
           >
             Sign In
           </button>

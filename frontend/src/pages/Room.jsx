@@ -1,83 +1,133 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 import { Users } from "lucide-react";
 import Navbar from "../components/Navbar";
+import { getPollByShareId, votePoll } from "../lib/poll.api";
+import { socket } from "../lib/socket";
 
 export default function Room() {
-  const [voted, setVoted] = useState(false);
-  const [votes, setVotes] = useState([5, 3]);
+  const { shareId } = useParams();
+  const votingRef = useRef(false);
 
-  const vote = (i) => {
-    if (voted) return;
-    const newVotes = [...votes];
-    newVotes[i]++;
-    setVotes(newVotes);
+  const [poll, setPoll] = useState(null);
+  const [voted, setVoted] = useState(false);
+
+  // fetch poll
+  useEffect(() => {
+    const loadPoll = async () => {
+      try {
+        const data = await getPollByShareId(shareId);
+        setPoll(data);
+      } catch (err) {
+        console.log("Fetch poll error:", err);
+      }
+    };
+    loadPoll();
+  }, [shareId]);
+
+  // socket real time
+  useEffect(() => {
+    if (!socket.connected) socket.connect();
+
+    socket.emit("joinPoll", shareId);
+
+    socket.on("voteUpdated", (data) => {
+      console.log("Realtime update:", data);
+
+      setPoll((prev) => ({
+        ...prev,
+        options: data.options,
+      }));
+    });
+
+    return () => {
+      socket.off("voteUpdated");
+    
+    };
+  }, [shareId]);
+
+  if (!poll) return <div className="p-10 text-center">Loading...</div>;
+
+  const total = poll.options.reduce((a, b) => a + b.votes, 0);
+
+  // voting
+  const vote = async (optionId) => {
+    if (votingRef.current || voted) return;
+
+    votingRef.current = true;
     setVoted(true);
+
+    try {
+      await votePoll(poll._id, optionId);
+      // backend will emit realtime update
+    } catch (err) {
+      console.log("Vote error:", err);
+    }
   };
 
-  const total = votes.reduce((a, b) => a + b, 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-500">
-      
       <Navbar />
 
       <div className="flex items-center justify-center px-4 py-16">
-        <div className="backdrop-blur-lg bg-white/85 border border-white/40 shadow-2xl rounded-3xl w-full max-w-lg p-8">
-          
+        <div className="bg-white/90 rounded-3xl w-full max-w-lg p-8 shadow-xl">
+
           <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              Best JS Framework?
+            <h1 className="text-3xl font-bold text-gray-800">
+              {poll.question}
             </h1>
 
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+            <div className="flex justify-center gap-2 text-sm text-gray-500 mt-2">
               <Users size={16} />
-              23 people voting live
+              Live voting
             </div>
           </div>
 
-          {["React", "Vue"].map((opt, i) => {
-            const percent = total ? (votes[i] / total) * 100 : 0;
+         
+          {poll.options.map((opt) => {
+            const percent = total ? (opt.votes / total) * 100 : 0;
 
             return (
-              <div key={i} className="mb-5">
+              <div key={opt._id} className="mb-5">
                 <button
-                  onClick={() => vote(i)}
+                  onClick={() => vote(opt._id)}
                   disabled={voted}
-                  className={`w-full p-3 rounded-xl border font-medium transition 
-                  ${voted 
-                    ? "bg-gray-100 cursor-not-allowed" 
-                    : "hover:bg-teal-50 hover:border-teal-400"
+                  className={`w-full p-3 rounded-xl border font-medium transition
+                  ${
+                    voted
+                      ? "bg-gray-100 cursor-not-allowed"
+                      : "hover:bg-teal-50 hover:border-teal-400"
                   }`}
                 >
-                  {opt}
+                  {opt.text}
                 </button>
 
-                <div className="w-full bg-gray-200 h-3 rounded-full mt-2 overflow-hidden">
+        
+                <div className="w-full bg-gray-200 h-3 mt-2 rounded-full overflow-hidden">
                   <div
-                    className="bg-gradient-to-r from-teal-400 to-cyan-500 h-3 rounded-full transition-all duration-500"
+                    className="bg-gradient-to-r from-teal-400 to-cyan-500 h-3 transition-all duration-500"
                     style={{ width: `${percent}%` }}
                   />
                 </div>
 
                 <div className="text-right text-xs text-gray-500 mt-1">
-                  {votes[i]} votes • {percent.toFixed(0)}%
+                  {opt.votes} votes • {percent.toFixed(0)}%
                 </div>
               </div>
             );
           })}
 
           {voted && (
-            <div className="text-center mt-4 text-green-600 font-medium">
-              ✔ You already voted
+            <div className="text-center mt-4 text-green-600 font-semibold">
+              You voted
             </div>
           )}
 
-          <div className="mt-8 text-center">
-            <p className="text-xs text-gray-500">Room Code</p>
-            <div className="text-lg font-bold tracking-widest text-teal-600">
-              AB12CD
-            </div>
+          <div className="text-center mt-6 text-teal-600 font-bold">
+            Room: {shareId}
           </div>
+
         </div>
       </div>
     </div>

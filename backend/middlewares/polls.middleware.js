@@ -12,7 +12,7 @@ const validatePoll = (req,res,next)=>{
     }
 
     for(let opt of options){
-        if(!opt.text || opt.trim===""){
+        if(!opt || opt.trim()===""){
             return res.status(400).json({message:"Each option must have a text"});
         }
     }
