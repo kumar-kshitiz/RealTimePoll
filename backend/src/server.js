@@ -51,6 +51,9 @@ io.on("connection", (socket) => {
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
+app.get("/",(req,res)=>{
+    res.send("working fine");
+})
 app.use("/api/v1/auth", userRoutes);
 app.use("/api/v1/poll", pollRoutes);
 app.use("/api/v1/vote", voteRoutes);
