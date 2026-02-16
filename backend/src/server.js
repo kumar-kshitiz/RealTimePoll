@@ -12,6 +12,9 @@ const voteRoutes = require("../routes/votes.routes");
 
 const port = process.env.PORT;
 const frontend_url = process.env.FRONTEND_URL || "http://localhost:5173";
+const mongodb_uri = process.env.MONGODB_URI;
+const db = process.env.DB;
+
 
 const app = express();
 const server = http.createServer(app);
@@ -53,15 +56,19 @@ app.use("/api/v1/poll", pollRoutes);
 app.use("/api/v1/vote", voteRoutes);
 
 
-mongoose
-  .connect("mongodb://127.0.0.1:27017/test")
-  .then(() => {
-    console.log("Database connected");
+const mongodb = async function () {
+  try {
+    await mongoose.connect(`${mongodb_uri}/${db}`);
+    console.log("Connected to MongoDB");
+  } catch (err) {
+    console.error("MongoDB connection error:", err);
+    process.exit(1);
+  }
+};
 
-    server.listen(port, () => {
-      console.log(`Server running on port ${port}`);
-    });
-  })
-  .catch(() => {
-    console.log("Database not able to connect");
+// start server only after DB connects
+mongodb().then(() => {
+  server.listen(port, () => {
+    console.log(`Server running on port ${port}`);
   });
+});
