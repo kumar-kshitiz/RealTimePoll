@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import PublicRoute from "./components/PublicRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import SignIn from "./pages/SignIn";
@@ -14,8 +15,25 @@ export default function App() {
       <Routes>
 
         {/* PUBLIC ROUTES */}
-        <Route path="/" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
+        {/* <Route path="/" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} /> */}
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <SignIn />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <SignUp />
+            </PublicRoute>
+          }
+        />
 
         {/* PROTECTED ROUTES */}
         <Route
