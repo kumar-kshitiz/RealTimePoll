@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import PublicRoute from "./components/PublicRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -73,6 +74,7 @@ export default function App() {
         />
 
       </Routes>
+      <Analytics />
     </BrowserRouter>
   );
 }
