@@ -2,6 +2,9 @@
 
 🔗 **Live Demo:** https://kshitiz-instavote-kumar.vercel.app/
 
+> **Note:** Frontend is deployed on **Vercel** and backend on **Render**.  
+> The backend runs on Render’s free tier, so the first request may take ~30–60 seconds or even more if the server has been inactive (cold start).
+
 A realtime anonymous polling application where users can join a poll via a shareable link and vote live.  
 Votes are persisted in the database and results update instantly using WebSockets.
 
