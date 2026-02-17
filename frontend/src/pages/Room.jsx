@@ -4,6 +4,13 @@ import { Users } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { getPollByShareId, votePoll } from "../lib/poll.api";
 import { socket } from "../lib/socket";
+import FingerprintJS from "@fingerprintjs/fingerprintjs";
+
+async function getDeviceId() {
+  const fp = await FingerprintJS.load();
+  const result = await fp.get();
+  return result.visitorId;
+}
 
 export default function Room() {
   const { shareId } = useParams();
@@ -58,7 +65,8 @@ export default function Room() {
     setVoted(true);
 
     try {
-      await votePoll(poll._id, optionId);
+      const device_id = await getDeviceId();
+      await votePoll(poll._id,optionId,device_id);
       // backend will emit realtime update
     } catch (err) {
       console.log("Vote error:", err);

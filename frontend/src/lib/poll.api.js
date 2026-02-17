@@ -20,10 +20,11 @@ export const getPollByShareId = async (shareId) => {
   }
 };
 
-export const votePoll = async (poll_id, option_id) => {
+export const votePoll = async (poll_id, option_id,device_id) => {
   const res = await api.post("/vote", {
     poll_id,
     option_id,
+    device_id
   });
 
   return res.data;
