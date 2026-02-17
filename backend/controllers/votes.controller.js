@@ -9,13 +9,24 @@ const vote = async(req,res)=>{
         const user_id = req.userId;
         const ipAddress = req.ip;
         
-        const existing = await Votes.findOne({
-            poll_id,
-            $or:[
-                {user_id},
-                {ipAddress}
-            ]
-        });
+        // const existing = await Votes.findOne({
+        //     poll_id,
+        //     $or:[
+        //         {user_id},
+        //         {ipAddress}
+        //     ]
+        // });
+
+        let query = { poll_id };
+
+        if (user_id) {
+            query.user_id = user_id;
+        }else {
+            query.ipAddress = ipAddress;
+        }
+
+        const existing = await Votes.findOne(query);
+
 
         if(existing){
             return res.status(401).json({message:"You have already voted"});
