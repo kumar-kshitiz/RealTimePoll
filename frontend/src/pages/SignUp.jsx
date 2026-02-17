@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, User } from "lucide-react";
+import { Mail, Lock, User, Loader2 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { signupUser } from "../lib/auth.api";
 import { useState } from "react";
@@ -13,24 +13,46 @@ export default function SignUp() {
     password: "",
   });
 
-  const handleSubmit = async()=>{
-    try{
-      console.log("e");
-      await signupUser(form);
-      nav("/home");
-    }catch(err){
-      console.log("Signup Failed",err);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async () => {
+    setError("");
+
+    if (!form.name || !form.email || !form.password) {
+      setError("All fields are required");
+      return;
     }
-  }
+
+    try {
+      setLoading(true);
+
+      const res = await signupUser(form);
+
+      // if backend returns token
+      if (res?.token) {
+        localStorage.setItem("token", res.token);
+      }
+
+      nav("/home");
+
+    } catch (err) {
+      setError(
+        err?.response?.data?.message ||
+        "Signup failed. Try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-500">
-      
       <Navbar />
 
       <div className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4 py-16">
         <div className="backdrop-blur-lg bg-white/80 shadow-2xl rounded-3xl w-full max-w-md p-8 border border-white/40">
-          
+
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold text-gray-800">Create Account</h1>
             <p className="text-gray-500 text-sm mt-1">
@@ -38,55 +60,78 @@ export default function SignUp() {
             </p>
           </div>
 
+          {/* ERROR UI */}
+          {error && (
+            <div className="mb-4 text-sm bg-red-100 border border-red-300 text-red-600 px-4 py-2 rounded-xl">
+              {error}
+            </div>
+          )}
+
           <div className="relative mb-4">
             <User className="absolute left-3 top-3.5 text-gray-400" size={18} />
             <input
-              id="name"
-              name="name"
               type="text"
               placeholder="Full Name"
               className="w-full border border-gray-300 pl-10 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-teal-400 focus:outline-none"
-              onChange={(e)=>{setForm({...form, name:e.target.value})}}
+              onChange={(e) =>
+                setForm({ ...form, name: e.target.value })
+              }
             />
           </div>
 
           <div className="relative mb-4">
             <Mail className="absolute left-3 top-3.5 text-gray-400" size={18} />
             <input
-              id="email"
-              name="email"
               type="email"
               placeholder="Email"
               className="w-full border border-gray-300 pl-10 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-teal-400 focus:outline-none"
-              onChange={(e)=>{setForm({...form, email:e.target.value})}}
+              onChange={(e) =>
+                setForm({ ...form, email: e.target.value })
+              }
             />
           </div>
 
           <div className="relative mb-6">
             <Lock className="absolute left-3 top-3.5 text-gray-400" size={18} />
             <input
-              id="password"
-              name="password"
               type="password"
               placeholder="Password"
               className="w-full border border-gray-300 pl-10 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-teal-400 focus:outline-none"
-              onChange={(e)=>{setForm({...form, password:e.target.value})}}
+              onChange={(e) =>
+                setForm({ ...form, password: e.target.value })
+              }
             />
           </div>
 
           <button
+            disabled={loading}
             onClick={handleSubmit}
-            className="w-full bg-gradient-to-r from-teal-400 to-cyan-500 text-white py-3 rounded-xl font-semibold shadow-md hover:scale-[1.02] transition"
+            className={`w-full py-3 rounded-xl font-semibold shadow-md transition flex items-center justify-center gap-2
+              ${loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-teal-400 to-cyan-500 text-white hover:scale-[1.02]"
+              }`}
           >
-            Create Account
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin" size={18} />
+                Creating account...
+              </>
+            ) : (
+              "Create Account"
+            )}
           </button>
 
           <p className="text-center text-sm mt-6 text-gray-600">
             Already have an account?{" "}
-            <Link to="/" className="text-teal-600 font-semibold hover:underline">
+            <Link
+              to="/"
+              className="text-teal-600 font-semibold hover:underline"
+            >
               Sign in
             </Link>
           </p>
+
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Mail, Lock } from "lucide-react";
+import { Mail, Lock, Loader2 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { useState } from "react";
 import { loginUser } from "../lib/auth.api";
@@ -7,7 +7,6 @@ import { loginUser } from "../lib/auth.api";
 export default function SignIn() {
   const navigate = useNavigate();
   const location = useLocation();
-
   const from = location.state?.from?.pathname || "/home";
 
   const [form, setForm] = useState({
@@ -15,18 +14,36 @@ export default function SignIn() {
     password: ""
   });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const handleSubmit = async () => {
+    setError("");
+
+    if (!form.email || !form.password) {
+      setError("Please enter email and password");
+      return;
+    }
+
     try {
+      setLoading(true);
+
       const res = await loginUser(form);
 
       if (res?.token) {
         localStorage.setItem("token", res.token);
+        navigate(from, { replace: true });
+      } else {
+        setError("Invalid email or password");
       }
 
-      navigate(from, { replace: true });
-
     } catch (err) {
-      console.log("Login Failed", err);
+      setError(
+        err?.response?.data?.message ||
+        "Invalid email or password"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,6 +60,13 @@ export default function SignIn() {
               Login to continue
             </p>
           </div>
+
+          {/* ERROR UI */}
+          {error && (
+            <div className="mb-4 text-sm bg-red-100 border border-red-300 text-red-600 px-4 py-2 rounded-xl">
+              {error}
+            </div>
+          )}
 
           <div className="relative mb-4">
             <Mail className="absolute left-3 top-3.5 text-gray-400" size={18} />
@@ -69,10 +93,22 @@ export default function SignIn() {
           </div>
 
           <button
-            className="w-full bg-gradient-to-r from-teal-400 to-cyan-500 text-white py-3 rounded-xl font-semibold shadow-md hover:scale-[1.02] transition"
+            disabled={loading}
             onClick={handleSubmit}
+            className={`w-full py-3 rounded-xl font-semibold shadow-md transition flex items-center justify-center gap-2
+              ${loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-teal-400 to-cyan-500 text-white hover:scale-[1.02]"
+              }`}
           >
-            Sign In
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin" size={18} />
+                Signing in...
+              </>
+            ) : (
+              "Sign In"
+            )}
           </button>
 
           <p className="text-center text-sm mt-6 text-gray-600">
