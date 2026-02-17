@@ -31,7 +31,7 @@ const pollsSchema = new Schema({
 },{timestamps:true});
 
 function optLimit(val){
-    return val.length>=2 && val.length<=4;
+    return val.length>=2 && val.length<=6;
 }
 
 const Polls = mongoose.model('Polls',pollsSchema);
