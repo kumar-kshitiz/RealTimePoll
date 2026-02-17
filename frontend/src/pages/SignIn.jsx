@@ -8,7 +8,6 @@ export default function SignIn() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // where user wanted to go
   const from = location.state?.from?.pathname || "/home";
 
   const [form, setForm] = useState({
@@ -20,7 +19,6 @@ export default function SignIn() {
     try {
       const res = await loginUser(form);
 
-      // IMPORTANT: ensure token stored
       if (res?.token) {
         localStorage.setItem("token", res.token);
       }
@@ -33,10 +31,10 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-500">
+    <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-500">
       <Navbar />
 
-      <div className="flex items-center justify-center px-4 py-16">
+      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4 py-16">
         <div className="backdrop-blur-lg bg-white/80 shadow-2xl rounded-3xl w-full max-w-md p-8 border border-white/40">
 
           <div className="text-center mb-6">

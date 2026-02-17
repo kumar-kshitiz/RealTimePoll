@@ -9,17 +9,15 @@ export default function JoinRoom() {
 
   const handleJoin = () => {
     if (!code.trim()) return;
-
-    // redirect to dynamic room URL
     nav(`/room/${code.trim()}`);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-500">
+    <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-500">
       <Navbar />
 
-      <div className="flex items-center justify-center px-4 py-16">
-        <div className="backdrop-blur-lg bg-white/80 border border-white/40 shadow-2xl rounded-3xl w-full max-w-md p-8">
+      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4 py-10">
+        <div className="backdrop-blur-lg bg-white/80 border border-white/40 shadow-2xl rounded-3xl w-full max-w-md mx-auto p-8">
 
           <div className="text-center mb-6">
             <Users className="mx-auto text-teal-500 mb-2" size={36} />
@@ -38,7 +36,7 @@ export default function JoinRoom() {
 
           <button
             onClick={handleJoin}
-            className="w-full bg-gradient-to-r from-teal-400 to-cyan-500 text-white py-3 rounded-xl font-semibold shadow-md hover:scale-[1.02]"
+            className="w-full bg-gradient-to-r from-teal-400 to-cyan-500 text-white py-3 rounded-xl font-semibold shadow-md active:scale-[0.98]"
           >
             Join Room
           </button>
@@ -55,3 +53,4 @@ export default function JoinRoom() {
     </div>
   );
 }
+

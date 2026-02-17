@@ -45,7 +45,6 @@ export default function CreateRoom() {
       const link = `${window.location.origin}/room/${res.shareId}`;
       setShareId(link);
 
-      // nav(`/room/${res.shareId}`);
     } catch (err) {
       alert(err);
       console.log(err);
@@ -53,10 +52,10 @@ export default function CreateRoom() {
   };
 
   return (
-    <>
+    <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-500">
       <Navbar />
 
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-500 px-4">
+      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4">
         <div className="backdrop-blur-lg bg-white/80 border border-white/40 shadow-2xl rounded-3xl w-full max-w-lg p-8">
           
           <div className="text-center mb-6">
@@ -67,7 +66,6 @@ export default function CreateRoom() {
             </p>
           </div>
 
-          {/* QUESTION */}
           <input
             placeholder="Poll question"
             value={question}
@@ -75,7 +73,6 @@ export default function CreateRoom() {
             className="w-full border border-gray-300 p-3 rounded-xl mb-4 focus:ring-2 focus:ring-teal-400"
           />
 
-          {/* OPTIONS */}
           {options.map((opt, i) => (
             <input
               key={i}
@@ -86,7 +83,6 @@ export default function CreateRoom() {
             />
           ))}
 
-          {/* ADD OPTION */}
           {options.length < 6 && (
             <button
               onClick={addOption}
@@ -96,7 +92,6 @@ export default function CreateRoom() {
             </button>
           )}
 
-          {/* SUBMIT */}
           <button
             onClick={handleCreate}
             className="w-full bg-gradient-to-r from-teal-400 to-cyan-500 text-white py-3 rounded-xl font-semibold shadow-md hover:scale-[1.02] transition"
@@ -105,37 +100,32 @@ export default function CreateRoom() {
           </button>
 
           {shareId && (
-  <div className="mt-6 bg-white/70 border border-teal-200 rounded-2xl p-5 shadow-sm">
+            <div className="mt-6 bg-white/70 border border-teal-200 rounded-2xl p-5 shadow-sm">
+              <p className="text-sm text-gray-500 mb-2 text-center">
+                Share this link to invite others
+              </p>
 
-    <p className="text-sm text-gray-500 mb-2 text-center">
-      Share this link to invite others
-    </p>
+              <div className="flex items-center gap-2">
+                <input
+                  readOnly
+                  value={`${shareId}`}
+                  className="flex-1 px-3 py-2 rounded-lg border bg-gray-50 text-sm"
+                />
 
-    {/* LINK BOX */}
-    <div className="flex items-center gap-2">
-      <input
-        readOnly
-        value={`${shareId}`}
-        className="flex-1 px-3 py-2 rounded-lg border bg-gray-50 text-sm"
-      />
-
-      <button
-        onClick={() =>
-          navigator.clipboard.writeText(
-            `${shareId}`
-          )
-        }
-        className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg text-sm"
-      >
-        Copy
-      </button>
-    </div>
-
-  </div>
-)}
+                <button
+                  onClick={() =>
+                    navigator.clipboard.writeText(`${shareId}`)
+                  }
+                  className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg text-sm"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+          )}
 
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -19,7 +19,6 @@ export default function Room() {
   const [poll, setPoll] = useState(null);
   const [voted, setVoted] = useState(false);
 
-  // fetch poll
   useEffect(() => {
     const loadPoll = async () => {
       try {
@@ -32,15 +31,12 @@ export default function Room() {
     loadPoll();
   }, [shareId]);
 
-  // socket real time
   useEffect(() => {
     if (!socket.connected) socket.connect();
 
     socket.emit("joinPoll", shareId);
 
     socket.on("voteUpdated", (data) => {
-      console.log("Realtime update:", data);
-
       setPoll((prev) => ({
         ...prev,
         options: data.options,
@@ -49,7 +45,6 @@ export default function Room() {
 
     return () => {
       socket.off("voteUpdated");
-    
     };
   }, [shareId]);
 
@@ -57,7 +52,6 @@ export default function Room() {
 
   const total = poll.options.reduce((a, b) => a + b.votes, 0);
 
-  // voting
   const vote = async (optionId) => {
     if (votingRef.current || voted) return;
 
@@ -66,19 +60,17 @@ export default function Room() {
 
     try {
       const device_id = await getDeviceId();
-      await votePoll(poll._id,optionId,device_id);
-      // backend will emit realtime update
+      await votePoll(poll._id, optionId, device_id);
     } catch (err) {
       console.log("Vote error:", err);
     }
   };
 
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-500">
+    <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-500">
       <Navbar />
 
-      <div className="flex items-center justify-center px-4 py-16">
+      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4 py-16">
         <div className="bg-white/90 rounded-3xl w-full max-w-lg p-8 shadow-xl">
 
           <div className="text-center mb-6">
@@ -92,7 +84,6 @@ export default function Room() {
             </div>
           </div>
 
-         
           {poll.options.map((opt) => {
             const percent = total ? (opt.votes / total) * 100 : 0;
 
@@ -111,7 +102,6 @@ export default function Room() {
                   {opt.text}
                 </button>
 
-        
                 <div className="w-full bg-gray-200 h-3 mt-2 rounded-full overflow-hidden">
                   <div
                     className="bg-gradient-to-r from-teal-400 to-cyan-500 h-3 transition-all duration-500"
