@@ -14,7 +14,7 @@ const votesSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
-    ipAddress:{
+    device_id:{
         type:String,
     },
     

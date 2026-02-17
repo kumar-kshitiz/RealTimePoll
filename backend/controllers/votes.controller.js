@@ -5,27 +5,14 @@ const Votes = require("../models/votes.model");
 
 const vote = async(req,res)=>{
     try{
-        const {poll_id,option_id} = req.body;
+        const {poll_id,option_id,device_id} = req.body;
         const user_id = req.userId;
-        const ipAddress = req.ip;
+        // const ipAddress = req.ip;
         
-        // const existing = await Votes.findOne({
-        //     poll_id,
-        //     $or:[
-        //         {user_id},
-        //         {ipAddress}
-        //     ]
-        // });
-
-        let query = { poll_id };
-
-        if (user_id) {
-            query.user_id = user_id;
-        }else {
-            query.ipAddress = ipAddress;
-        }
-
-        const existing = await Votes.findOne(query);
+        const existing = await Votes.findOne({
+            poll_id,
+            device_id
+        });
 
 
         if(existing){
@@ -36,7 +23,7 @@ const vote = async(req,res)=>{
             poll_id,
             option_id,
             user_id,
-            ipAddress
+            device_id
         });
 
         await Polls.updateOne(
